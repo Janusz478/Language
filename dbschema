@@ -1,0 +1,11 @@
+CREATE TABLE `languages` (
+  `language_id` int(11) NOT NULL AUTO_INCREMENT,
+  `language_name` varchar(30) NOT NULL,
+  `language_architecture` enum('imperative','oop','other') NOT NULL,
+  `language_implementation` enum('compiler','interpreter','VM','mixed') NOT NULL,
+  `language_system` set('Unix','Windows','other') NOT NULL,
+  `language_description` varchar(255) NOT NULL,
+  `language_year` int(11) NOT NULL,
+  PRIMARY KEY (`language_id`),
+  KEY `language_name` (`language_name`)
+)

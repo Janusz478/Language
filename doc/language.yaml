@@ -1,0 +1,262 @@
+openapi: 3.0.0
+info:
+  title: Language API
+  description: |
+    This is an example API from the book IT-Handbuch für Fachinformatiker. 
+    This API stores and sends some programming Languages
+  termsOfService: http://swagger.io/terms/
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+- url: http://localhost
+  description: Only avaidable on a local Apache Webserver
+tags:
+- name: language
+  description: Programming Languages Information
+paths:
+  /language/:
+    get:
+      tags:
+        - language
+      summary: Get all programming languages or search for programming languages
+      description: Get all of the languages or some languages searched for with the search parameter.
+      operationId: getLanguages
+      parameters:
+        - name: search
+          description: Complete programming language name or part of it
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Everything went fine
+          content:
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/languages"       
+    post:
+      security:
+        - basicAuth: []
+      tags:
+        - language
+      summary: Add a new Programming Language
+      responses:
+        "200":
+          description: Created the new language
+          content:
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/success"
+        "403":
+          $ref: "#/components/responses/unauthorized"
+      requestBody:
+        description: The programming language that should be added
+        content:
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/language_without_id"
+  
+  /language/{languageId}:
+    get:
+      tags:
+        - language
+      summary: Get the language with the languageId
+      description: Get the language specified with the languageId
+      operationId: getLanguage
+      parameters:
+        - $ref: "#/components/parameters/languageId"
+      responses:
+        "200":
+          description: Everything went fine
+          content:
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/language"
+        "404":
+          description: The language could not be found
+          content:
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/error"
+    put:
+      security:
+        - basicAuth: []
+      tags:
+        - language
+      summary: Change an existing programming language
+      responses:
+        "200":
+          description: Changed the language
+          content:
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/success"
+        "403":
+          $ref: "#/components/responses/unauthorized"
+        "400":
+          $ref: "#/components/responses/badRequest"
+      parameters:
+        - $ref: "#/components/parameters/languageId"
+      requestBody:
+        description: Only add that parts of the programming language, that should be changed
+        content:
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/language_without_id"
+    delete:
+      security:
+        - basicAuth: []
+      tags:
+        - language
+      summary: Delete an existing programming language
+      responses:
+        "200":
+          description: Deleted the language
+          content:
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/success"
+        "403":
+          $ref: "#/components/responses/unauthorized"
+        "400":
+          $ref: "#/components/responses/badRequest"
+      parameters:
+        - $ref: "#/components/parameters/languageId"
+
+components:
+  schemas:
+    language_without_id:
+      description: A programming Language
+      type: object
+      properties:
+        name:
+          type: string
+        architecture:
+          type: string
+          enum:
+          - imperative
+          - oop
+          - other
+        implementation:
+          type: string
+          enum:
+          - compiler
+          - interpreter
+          - VM
+          - mixed
+        system:
+          type: string
+          enum:
+          - Unix
+          - Windows
+          - other
+        description:
+          type: string
+        year:
+          type: string
+    language:
+      description: A programming Language
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        architecture:
+          type: string
+          enum:
+          - imperative
+          - oop
+          - other
+        implementation:
+          type: string
+          enum:
+          - compiler
+          - interpreter
+          - VM
+          - mixed
+        system:
+          type: string
+          enum:
+          - Unix
+          - Windows
+          - other
+        description:
+          type: string
+        year:
+          type: string
+    languages:
+      type: array
+      minItems: 1
+      maxItems: 100
+      items: 
+        type: object
+        properties:
+          language:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              architecture:
+                type: string
+                enum:
+                - imperative
+                - oop
+                - other
+              implementation:
+                type: string
+                enum:
+                - compiler
+                - interpreter
+                - VM
+                - mixed
+              system:
+                type: string
+                enum:
+                - Unix
+                - Windows
+                - other
+              description:
+                type: string
+              year:
+                type: string
+    error:
+      type: object
+      properties:
+          message:
+            type: string
+    success:
+      type: object
+      properties:
+          message:
+            type: string
+  securitySchemes:
+    basicAuth:     # <-- arbitrary name for the security scheme
+      type: http
+      scheme: basic
+  parameters:
+    languageId:
+      name: languageId
+      in: path
+      description: The programming language to use for the method
+      required: true
+      schema:
+        type: integer
+  responses:
+    unauthorized:
+      description: You are not authorized for this method
+      content:
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/error"
+    badRequest:
+      description: The request was incorrect
+      content:
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/error"
